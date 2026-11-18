@@ -535,10 +535,10 @@ const VIEWS = {
   },
   roster(){
     const list = playersOf(S.rteam);
-    const item = p => `<div class="pitem" onclick="App.editPlayer('${p.id}')"><b>${esc(p.name)}</b>${p.num?' #'+esc(p.num):''}<small>${handTag(p)}</small></div>`;
+    const item = p => `<div class="pitem" onclick="App.editPlayer('${p.id}')"><b>${esc(p.name)}</b>${p.num?' #'+esc(p.num):''}<small>${p.pos?esc(p.pos)+' · ':''}${handTag(p)}</small></div>`;
     const ps = list.filter(isP), bs = list.filter(p=>!isP(p));
     return `<div class="chips" style="margin-bottom:8px">${['LG',...TEAMS].map(t=>chip(t,S.rteam===t,`App.set('rteam','${t}')`)).join('')}</div>
-    <div class="row between"><b>${S.rteam} 선수 ${list.length}명</b><button class="btn" onclick="App.newPlayer()">+ 선수 추가</button></div>
+    <div class="row between"><b>${S.rteam} 선수 ${list.length}명</b><span><button class="btn ghost" onclick="App.openBulk()">📋 한꺼번에 넣기</button> <button class="btn" onclick="App.newPlayer()">+ 선수 추가</button></span></div>
     <h3 class="sec">투수 (${ps.length})</h3>${ps.map(item).join('') || '<p class="hint">없음</p>'}
     <h3 class="sec">타자 (${bs.length})</h3>${bs.map(item).join('') || '<p class="hint">없음</p>'}
     <p class="hint">손 방향·투구폼은 한 번만 정하면 모든 경기에 자동으로 붙습니다. 이적한 선수는 [수정]에서 팀만 바꾸세요.</p>`;
@@ -747,6 +747,60 @@ function playerM(){
   <p class="hint">한 번 정하면 모든 경기에 자동으로 붙습니다. 바꾸면 그다음 기록부터 새 값이 들어가고 예전 기록은 그대로 남습니다.</p>
   ${btnRow('App.savePlayer()', d.id?'App.delPlayer()':'')}`;
 }
+// ----- 명단 한꺼번에 넣기 -----
+const POSMAP = {투수:'투수',포수:'포수',내야:'내야수',내야수:'내야수',외야:'외야수',외야수:'외야수',투타:'투타'};
+const FORMMAP = {오버핸드:'오버핸드',오버:'오버핸드',스리쿼터:'스리쿼터',쓰리쿼터:'스리쿼터',사이드암:'사이드암',사이드:'사이드암',언더핸드:'언더핸드',언더:'언더핸드'};
+const HANDK = {우:'R',좌:'L',양:'S'};
+function parseLine(line, team){
+  let t = line.trim().split(/[\s,\t]+/).filter(Boolean);
+  if (!t.length) return null;
+  const m0 = t[0].match(/^(\d{1,3})(\D.*)$/); if (m0) t = [m0[1], m0[2], ...t.slice(1)];   // "27박동원" 처럼 붙여 쓴 경우
+  const r = {line:line.trim(), num:'', name:'', pos:'', throws:'', bats:'', form:'', notes:[], err:''};
+  for (const w of t){
+    if (/^\d{1,3}$/.test(w) && !r.num && !r.name){ r.num = w; continue; }
+    if (POSMAP[w]){ r.pos = POSMAP[w]; continue; }
+    let m = w.match(/^(우|좌)투((우|좌|양)타)?$/);
+    if (m){ r.throws = HANDK[m[1]]; if (m[3]) r.bats = HANDK[m[3]]; continue; }
+    m = w.match(/^(우|좌|양)타$/);
+    if (m){ r.bats = HANDK[m[1]]; continue; }
+    if (FORMMAP[w]){ r.form = FORMMAP[w]; continue; }
+    if (!r.name) r.name = w; else r.err = `무슨 뜻인지 모르는 글자: "${w}"`;
+  }
+  if (!r.name) r.err = '이름이 없습니다';
+  r.type = r.pos==='투수' ? 'P' : r.pos==='투타' ? 'PB' : r.pos ? 'B' : (r.form ? 'P' : 'B');
+  if (r.type.includes('P')){
+    if (!r.throws){ r.throws = 'R'; r.notes.push('손 방향 없음 → 우투'); }
+    if (!r.form){ r.form = '오버핸드'; r.notes.push('투구폼 없음 → 오버핸드'); }
+  }
+  if (r.type.includes('B') && !r.bats){ r.bats = r.throws || 'R'; r.notes.push(`치는 손 없음 → ${r.bats==='L'?'좌타':'우타'}`); }
+  if (!r.throws) r.throws = 'R';
+  if (!r.pos) r.pos = r.type==='P' ? '투수' : '';
+  r.old = S.players.find(p => p.team===team && p.name===r.name && (!p.num || !r.num || p.num===r.num));
+  return r;
+}
+function bulkM(){
+  const b = S.bulk;
+  const rows = b.rows;
+  const ok = rows ? rows.filter(r=>!r.err) : [];
+  return `<h3>📋 명단 한꺼번에 넣기</h3>
+  <div class="frow"><label>팀</label><div class="chips">${['LG',...TEAMS].map(t=>chip(t,b.team===t,`App.bteam('${t}')`)).join('')}</div></div>
+  <p class="hint">한 줄에 한 명씩: <b>배번 이름 포지션 투타 투구폼</b> (순서는 상관없고 빈칸이나 쉼표로 띄웁니다)</p>
+  <pre style="background:#f6f6f8;padding:8px;border-radius:8px;font-size:13px;margin:4px 0">27 박동원 포수 우투우타
+2 문보경 내야 우투좌타
+1 임찬규 투수 우투 오버핸드
+61 고영표 투수 우투 언더</pre>
+  <textarea rows="9" style="width:100%" placeholder="여기에 붙여 넣으세요" oninput="App.btext(this.value)">${esc(b.text)}</textarea>
+  <div class="btns" style="margin-top:6px"><button class="btn ghost" onclick="App.bpreview()">미리 보기</button></div>
+  ${rows ? `<h4 style="margin:12px 0 6px">미리 보기 · ${b.team} · 등록 ${ok.length}명${rows.length>ok.length?` · 오류 ${rows.length-ok.length}줄`:''}</h4>
+    <div class="tw"><table class="t"><thead><tr><th>이름</th><th>배번</th><th>포지션</th><th>손 · 투구폼</th><th>결과</th></tr></thead><tbody>${
+      rows.map(r => r.err
+        ? `<tr><td colspan="5" style="color:#c00">⚠ ${esc(r.line)} — ${esc(r.err)}</td></tr>`
+        : `<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.num)||'-'}</td><td>${esc(r.pos)||'-'}</td><td>${handTag(r)}</td>
+           <td>${r.old?'고치기':'새로'}${r.notes.length?`<br><small style="color:#8a6000">${r.notes.map(esc).join(', ')}</small>`:''}</td></tr>`).join('')
+    }</tbody></table></div>
+    <p class="hint">"고치기"는 이미 있는 선수의 정보를 새 값으로 바꿉니다. 오류 줄은 등록되지 않으니 고친 뒤 다시 [미리 보기]를 누르세요.</p>`:''}
+  <div class="btns">${ok.length?`<button class="btn" onclick="App.bsave()">${ok.length}명 등록하기</button>`:''}<button class="btn ghost" onclick="App.closeM()">닫기</button></div>`;
+}
 function openPlayerForm(id, preset={}){
   S.pd = id ? {...S.pm[id]} : {id:'',name:'',num:'',team:preset.team||'LG',type:preset.type||'B',throws:'R',form:'오버핸드',bats:'R'};
   openM(playerM);
@@ -948,6 +1002,29 @@ window.App = {
 
   // --- 선수 명단 ---
   newPlayer(){ openPlayerForm(null,{team:S.rteam, type:'B'}); },
+  openBulk(){ S.bulk = {team:S.rteam, text:'', rows:null}; openM(bulkM); },
+  bteam(t){ S.bulk.team = t; if (S.bulk.rows) App.bpreview(); else drawM(); },
+  btext(v){ S.bulk.text = v; },
+  bpreview(){
+    const b = S.bulk;
+    b.rows = b.text.split(/\r?\n/).map(l => parseLine(l, b.team)).filter(Boolean);
+    const seen = {};   // 붙여 넣은 글 안에서 같은 선수가 두 번 나오면 표시
+    b.rows.forEach(r => { if (r.err) return; const k = r.name+'|'+r.num; if (seen[k]) r.err = '같은 선수가 두 번 있습니다'; seen[k] = 1; });
+    if (!b.rows.length) toast('붙여 넣은 내용이 없습니다');
+    drawM();
+  },
+  bsave(){
+    const b = S.bulk; let n = 0;
+    for (const r of b.rows){
+      if (r.err) continue;
+      const p = r.old ? {...r.old} : {id:uid(), team:b.team};
+      Object.assign(p, {name:r.name, num:r.num || p.num || '', pos:r.pos || p.pos || '', type:r.type, throws:r.throws, form:r.form || p.form || '', bats:r.bats || p.bats || 'R'});
+      const i = S.players.findIndex(x => x.id===p.id);
+      if (i>=0) S.players[i] = p; else S.players.push(p);
+      savePlayerDB(p); n++;
+    }
+    refreshPM(); S.rteam = b.team; closeM(); toast(`${n}명을 등록했습니다`);
+  },
   editPlayer(id){ openPlayerForm(id); },
   pd(k,v){ S.pd[k] = v; drawM(); },
   pdset(k,v){ S.pd[k] = v; },
