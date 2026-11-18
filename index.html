@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>LG 경기 기록장</title>
+<meta name="theme-color" content="#C30452">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--lg:#C30452;--line:#e2e2e6;--bg:#f4f4f6}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:#222;font-size:15px}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:5;background:var(--lg);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;gap:8px}
+.title{font-weight:700;font-size:17px;flex:1;text-align:center}
+.years{display:flex;gap:4px;padding:8px 10px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line)}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line)}
+.tabs button{flex:0 0 auto;border:0;background:none;padding:11px 13px;font-size:15px;color:#666;border-bottom:3px solid transparent}
+.tabs button.on{color:var(--lg);border-color:var(--lg);font-weight:700}
+.tabs.sub{position:sticky;top:46px;z-index:4}
+main{padding:10px;max-width:1100px;margin:0 auto}
+.chip{white-space:nowrap;flex:0 0 auto;border:1px solid #ccc;background:#fff;border-radius:18px;padding:7px 12px;font-size:14px;margin:3px;color:#333}
+.chip.on{background:var(--lg);color:#fff;border-color:var(--lg)}
+.chips{display:flex;flex-wrap:wrap;align-items:center}
+.btn{background:var(--lg);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700}
+.btn.ghost{background:#eee;color:#333}
+.mini{border:1px solid #ccc;background:#fff;border-radius:8px;padding:5px 9px;font-size:13px;color:#333}
+.top .mini{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.5)}
+.danger{color:#c00 !important}
+.link{border:0;background:none;color:#0a58ca;font-size:14px;padding:2px;text-align:left}
+.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.card h4{margin:0 0 8px}
+.frow{display:flex;align-items:center;gap:6px;margin:7px 0;flex-wrap:wrap}
+.frow>label{min-width:90px;font-weight:600;color:#555;font-size:14px}
+select,input,textarea{font-size:15px;padding:7px;border:1px solid #ccc;border-radius:8px;background:#fff;font-family:inherit}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.between{justify-content:space-between}
+.sum{font-weight:700}
+.gcard{background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,.06);cursor:pointer}
+.gd{font-size:13px;color:#777}.gv{font-size:17px;margin-top:2px}.gs{font-size:18px;font-weight:700;white-space:nowrap}
+.rb{display:inline-block;font-size:13px;padding:2px 8px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.rb.W{background:var(--lg);color:#fff}.rb.L{background:#333;color:#fff}.rb.D{background:#999;color:#fff}.rb.ing{background:#fff4d6;color:#8a6000}
+.score{font-size:20px;font-weight:700;text-align:center;margin-top:8px}
+.empty{color:#888;text-align:center;padding:24px 8px;line-height:1.7}
+.hint{color:#777;font-size:13px;margin:6px 0}
+.tw{overflow-x:auto;border-radius:10px;margin-bottom:14px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+table.t{border-collapse:collapse;font-size:13px;white-space:nowrap;width:100%}
+.t th,.t td{border-bottom:1px solid #eee;padding:8px;text-align:right}
+.t th:first-child,.t td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1}
+.t th{background:#fafafa;color:#555}
+.t th:first-child{background:#fafafa}
+h3.sec{margin:16px 2px 8px;font-size:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px;margin-bottom:12px}
+.stat{background:#fff;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.stat small{color:#777;display:block;font-size:12px}.stat b{font-size:18px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.fl{font-size:13px;color:#555;display:flex;align-items:center;gap:4px}
+.gridwrap{overflow-x:auto;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+table.grid{border-collapse:collapse;font-size:13px}
+.grid th{background:#fafafa;padding:6px;border:1px solid #eee;font-weight:600;color:#555}
+.grid td{border:1px solid #eee;padding:4px;vertical-align:top}
+.grid .sticky{position:sticky;left:0;background:#fff;z-index:1;min-width:120px;max-width:150px}
+.grid th.sticky{background:#fafafa}
+.grid tr.subrow .sticky{background:#fbf7f9}
+.grid td.cell{min-width:58px;height:46px;cursor:pointer}
+.grid td.cell:hover{background:#fff6f9}
+.pos{color:#888;font-size:12px;margin-left:2px}
+.r{display:block;font-size:12px;border-radius:4px;padding:1px 4px;margin:1px 0;white-space:nowrap}
+span.r.inl{display:inline-block}
+.r.hit{background:#ffe3ec;color:#a0003a;font-weight:700}.r.ob{background:#e3f0ff;color:#0950a0}.r.out{background:#efefef;color:#555}.r.sac{background:#fff4d6;color:#8a6000}.r.etc{background:#eafbe7;color:#2c6e1f}
+.chip.res.hit{border-color:#f3b3c8}.chip.res.ob{border-color:#b3d1f3}.chip.res.sac{border-color:#f0d58a}.chip.res.etc{border-color:#b5e3ab}
+.chip.on.res{background:var(--lg);color:#fff;border-color:var(--lg)}
+.rg{margin:6px 0}.rgl{font-size:12px;color:#888;margin:4px 3px 0}
+.inn{background:#fff;border-radius:12px;margin-bottom:8px;padding:10px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.innh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.innh span{font-size:13px;color:#666}
+.li{display:flex;align-items:center;gap:6px;padding:6px 4px;border-bottom:1px solid #f2f2f2;cursor:pointer;flex-wrap:wrap}
+.li small{color:#888}.li .sp{flex:1}
+.chg{font-size:12px;color:#0a58ca;padding:4px}
+.runs{color:var(--lg);font-weight:700;font-size:13px}
+.prow{border-bottom:1px solid #f0f0f0;padding:8px 0}
+.sc{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:16px}
+.sc span{min-width:50px;font-weight:700}.sc b{font-size:22px;min-width:30px;text-align:center}
+.pitem{background:#fff;border-radius:10px;padding:11px 12px;margin-bottom:6px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.pitem small{color:#888;margin-left:6px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.modal.hidden{display:none}
+.sheet{background:#fff;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:14px 14px 28px}
+.sheet h3{margin:4px 0 10px}
+.btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.login{text-align:center;padding:80px 20px}.login .logo{font-size:60px}
+.badge{white-space:nowrap;background:#fff;color:var(--lg);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:700}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:50;display:none}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:16px}}
+</style>
+</head>
+<body>
+<div id="app"><p class="empty">불러오는 중...</p></div>
+<div id="modal" class="modal hidden" onclick="if(event.target===this)App.closeM()"></div>
+<div id="toast"></div>
+
+<script type="module">
+// =====================================================================
+// ① 파이어베이스 설정 — 이 부분만 내 파이어베이스 값으로 바꾸면 됩니다.
+//    (값을 안 바꾸면 "연습 모드"로 이 기기에만 저장됩니다)
+// =====================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCDDx6oJU0khg3so-fYxMfoCIknJ-N9uVw",
+  authDomain: "lg-baseball.firebaseapp.com",
+  projectId: "lg-baseball",
+  storageBucket: "lg-baseball.firebasestorage.app",
+  messagingSenderId: "234512426208",
+  appId: "1:234512426208:web:9782f40dc3b653fb7fdc85"
+};
+
+// =====================================================================
+// ② 기본 목록 (팀, 구장, 포지션, 결과 종류)
+// =====================================================================
+const YEARS = ['2027','2028','2029','2030','2031','통산'];
+const TEAMS = ['SSG','삼성','두산','KIA','롯데','한화','NC','KT','키움'];
+const TEAM_PARK = {SSG:'문학',삼성:'대구',두산:'잠실',KIA:'광주',롯데:'사직',한화:'대전',NC:'창원',KT:'수원',키움:'고척'};
+const PARKS = ['잠실','문학','대구','광주','사직','대전','창원','수원','고척','포항','울산','청주','기타'];
+const FORMS = ['오버핸드','스리쿼터','사이드암','언더핸드'];
+const POS = ['포수','1루','2루','3루','유격','좌익','중견','우익','지명','대타','대주자','투수'];
+const DEC = [['','없음'],['W','승'],['L','패'],['SV','세이브'],['HLD','홀드']];
+
+// 타석 결과: [코드, 이름, 묶음, 짧은이름, 계산정보]
+// ab=타수 h=안타 tb=루타 bb=볼넷 hbp=사구 so=삼진 sh=희번 sf=희플 gdp=병살 outs=아웃수
+const RESULTS = [
+  ['1B','안타','안타','안타',{ab:1,h:1,tb:1}],
+  ['IH','내야안타','안타','내안',{ab:1,h:1,tb:1}],
+  ['BH','번트안타','안타','번안',{ab:1,h:1,tb:1}],
+  ['2B','2루타','안타','2루타',{ab:1,h:1,tb:2}],
+  ['3B','3루타','안타','3루타',{ab:1,h:1,tb:3}],
+  ['HR','홈런','안타','홈런',{ab:1,h:1,tb:4}],
+  ['IPHR','그라운드 홈런','안타','G홈런',{ab:1,h:1,tb:4}],
+  ['BB','볼넷','출루','볼넷',{bb:1}],
+  ['IBB','고의4구','출루','고4',{bb:1,ibb:1}],
+  ['HBP','몸에 맞는 공','출루','사구',{hbp:1}],
+  ['CI','타격방해','출루','타방',{}],
+  ['SO','헛스윙 삼진','아웃','삼진',{ab:1,so:1,outs:1}],
+  ['SOL','루킹 삼진','아웃','루킹',{ab:1,so:1,outs:1}],
+  ['K3','낫아웃 출루','아웃','낫아웃',{ab:1,so:1}],
+  ['GO','땅볼','아웃','땅볼',{ab:1,outs:1}],
+  ['FO','외야 뜬공','아웃','뜬공',{ab:1,outs:1}],
+  ['PO','내야 뜬공','아웃','내뜬',{ab:1,outs:1}],
+  ['LO','직선타','아웃','직선',{ab:1,outs:1}],
+  ['FFO','파울플라이','아웃','파플',{ab:1,outs:1}],
+  ['GDP','병살타','아웃','병살',{ab:1,gdp:1,outs:2}],
+  ['TP','삼중살타','아웃','삼중살',{ab:1,outs:3}],
+  ['BF','번트 실패','아웃','번실',{ab:1,outs:1}],
+  ['SH','희생번트','희생','희번',{sh:1,outs:1}],
+  ['SF','희생플라이','희생','희플',{sf:1,outs:1}],
+  ['E','실책 출루','기타','실책',{ab:1}],
+  ['FC','야수선택','기타','야선',{ab:1,outs:1}],
+];
+const RES = {}; RESULTS.forEach(([k,n,g,sh,o]) => RES[k] = {k,n,g,sh,...o});
+const GCLS = {안타:'hit',출루:'ob',아웃:'out',희생:'sac',기타:'etc'};
+
+// 주루·수비 기록 종류 (def=수비 중 기록 → 투수 아웃/실점과 연결)
+const EVENTS = [
+  {k:'R',n:'득점',g:'주루'},
+  {k:'SB',n:'도루 성공',g:'주루'},
+  {k:'CS',n:'도루 실패',g:'주루'},
+  {k:'PKO',n:'견제사 당함',g:'주루'},
+  {k:'TOOB',n:'주루사',g:'주루'},
+  {k:'EF',n:'포구 실책',g:'수비',def:1},
+  {k:'ET',n:'송구 실책',g:'수비',def:1},
+  {k:'FINE',n:'파인플레이',g:'수비',def:1},
+  {k:'AST',n:'보살',g:'수비',def:1},
+  {k:'DP',n:'병살 참여',g:'수비',def:1},
+  {k:'TPP',n:'삼중살 참여',g:'수비',def:1},
+  {k:'ORO',n:'상대 주자 아웃(기타)',g:'수비',def:1,outs:1},
+  {k:'CSO',n:'도루 저지',g:'포수',def:1,outs:1},
+  {k:'SBA',n:'도루 허용',g:'포수',def:1},
+  {k:'PB',n:'포일',g:'포수',def:1},
+  {k:'PK',n:'견제사 성공',g:'투수',def:1,outs:1},
+  {k:'WP',n:'폭투',g:'투수',def:1},
+  {k:'BK',n:'보크',g:'투수',def:1},
+];
+const EV = {}; EVENTS.forEach(e => EV[e.k] = e);
+
+// =====================================================================
+// ③ 앱 상태 (화면에서 지금 무엇을 보고 있는지)
+// =====================================================================
+const thisYear = String(new Date().getFullYear());
+const S = {
+  year: YEARS.includes(thisYear) ? thisYear : '2027',
+  tab:'games', players:[], games:[], pm:{},
+  edit:null, gTab:'bat', d:{}, pd:{}, c:{}, newFor:null,
+  fb:{opp:'',ph:'',pf:'',ha:''}, fp:{opp:'',bs:'',ha:''},
+  rteam:'LG', cond:'', vsMode:'bat', vsP:'', vsTeam:'', user:null
+};
+
+// ----- 작은 도우미 함수들 -----
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const f3 = v => (v == null || !isFinite(v)) ? '-' : (v >= 1 ? v.toFixed(3) : v.toFixed(3).replace(/^0/,''));
+const f2 = v => (v == null || !isFinite(v)) ? '-' : v.toFixed(2);
+const pct = (w,l) => (w+l) ? f3(w/(w+l)) : '-';
+const ipStr = o => Math.floor(o/3) + (o%3 ? ' ' + (o%3) + '/3' : '');
+const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const fmtDate = s => { const d = new Date(s+'T00:00:00'); return isNaN(d) ? s : `${d.getMonth()+1}/${d.getDate()}(${'일월화수목금토'[d.getDay()]})`; };
+const refreshPM = () => { S.pm = Object.fromEntries(S.players.map(p => [p.id,p])); };
+const pn = id => S.pm[id]?.name || (id ? '(삭제된 선수)' : '-');
+const isP = p => (p?.type||'').includes('P');
+const isB = p => (p?.type||'').includes('B');
+const handTag = p => {
+  if (!p) return '';
+  const a = [];
+  if (isP(p)) a.push((p.throws==='L'?'좌투':'우투') + (p.form ? ' ' + p.form : ''));
+  if (isB(p)) a.push({L:'좌타',R:'우타',S:'양타'}[p.bats] || '');
+  return a.join(' · ');
+};
+const playersOf = (team, role) => S.players
+  .filter(p => p.team === team && (!role || (p.type||'').includes(role)))
+  .sort((a,b) => a.name.localeCompare(b.name,'ko'));
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>t.style.display='none',2200); }
+
+// 버튼 모양 만들기
+const chip = (label,on,act,cls='') => `<button class="chip ${cls} ${on?'on':''}" onclick="${act}">${esc(label)}</button>`;
+const nums = (field,val,max) => Array.from({length:max+1},(_,n)=>chip(n,val===n,`App.d('${field}',${n})`)).join('');
+function pSelect(val, list, act){
+  return `<select onchange="${act}"><option value="">-- 선택 --</option>${
+    list.map(p=>`<option value="${p.id}" ${p.id===val?'selected':''}>${esc(p.name)}${p.num?' #'+esc(p.num):''} (${handTag(p)})</option>`).join('')
+  }<option value="__new">+ 새 선수 추가</option></select>`;
+}
+function tbl(heads, rows){
+  return `<div class="tw"><table class="t"><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${
+    rows.length ? rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')
+                : `<tr><td colspan="${heads.length}" style="text-align:center;color:#999">기록 없음</td></tr>`
+  }</tbody></table></div>`;
+}
+const fsel = (label,val,opts,act) => `<label class="fl">${label}<select onchange="${act}">${opts.map(([v,n])=>`<option value="${v}" ${v===val?'selected':''}>${n}</option>`).join('')}</select></label>`;
+
+// =====================================================================
+// ④ 저장하기 (파이어베이스 또는 연습 모드)
+// =====================================================================
+const USE_FB = !firebaseConfig.apiKey.includes('여기에');
+let fb = null;
+const LS = 'lg-baseball-book-v1';
+const clean = o => JSON.parse(JSON.stringify(o));
+const saveLocal = () => { try{ localStorage.setItem(LS, JSON.stringify({players:S.players, games:S.games})); }catch(e){} };
+const loadLocal = () => { try{ const o = JSON.parse(localStorage.getItem(LS)||'{}'); S.players=o.players||[]; S.games=o.games||[]; }catch(e){} };
+const fail = e => { console.error(e); toast('저장 실패: 인터넷 연결을 확인하세요'); };
+
+function saveGame(g){
+  g.updated = Date.now();
+  if (!USE_FB) return saveLocal();
+  fb.F.setDoc(fb.F.doc(fb.db,'users',fb.uid,'games',g.id), clean(g)).catch(fail);
+}
+function removeGame(id){
+  if (!USE_FB) return saveLocal();
+  fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.uid,'games',id)).catch(fail);
+}
+function savePlayerDB(p){
+  if (!USE_FB) return saveLocal();
+  fb.F.setDoc(fb.F.doc(fb.db,'users',fb.uid,'players',p.id), clean(p)).catch(fail);
+}
+function removePlayer(id){
+  if (!USE_FB) return saveLocal();
+  fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.uid,'players',id)).catch(fail);
+}
+async function loadAll(){
+  const col = n => fb.F.collection(fb.db,'users',fb.uid,n);
+  const [gs, ps] = await Promise.all([fb.F.getDocs(col('games')), fb.F.getDocs(col('players'))]);
+  S.games = gs.docs.map(d => d.data());
+  S.players = ps.docs.map(d => d.data());
+  refreshPM();
+}
+async function initFirebase(){
+  const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  const [A0, A, F] = await Promise.all([import(V+'firebase-app.js'), import(V+'firebase-auth.js'), import(V+'firebase-firestore.js')]);
+  const app = A0.initializeApp(firebaseConfig);
+  let db;
+  try { db = F.initializeFirestore(app, {localCache: F.persistentLocalCache()}); }  // 인터넷이 잠깐 끊겨도 기록 유지
+  catch(e){ db = F.getFirestore(app); }
+  const auth = A.getAuth(app);
+  fb = {db, auth, A, F};
+  A.onAuthStateChanged(auth, async user => {
+    if (user) { fb.uid = user.uid; S.user = user; $('#app').innerHTML = '<p class="empty">불러오는 중...</p>'; await loadAll(); render(); }
+    else { S.user = null; renderLogin(); }
+  });
+}
+function renderLogin(){
+  $('#app').innerHTML = `<div class="login"><div class="logo">⚾</div><h2>LG 경기 기록장</h2>
+  <p>기록을 저장하려면 구글 계정으로 로그인하세요.</p><button class="btn" onclick="App.login()">구글로 로그인</button></div>`;
+}
+
+// =====================================================================
+// ⑤ 계산하기 (점수, 승패, 타자·투수 기록)
+// =====================================================================
+const curG = () => S.games.find(g => g.id === S.edit);
+const byDate = list => [...list].sort((a,b) => (a.date+(a.created||'')).localeCompare(b.date+(b.created||'')));
+const gamesIn = () => S.year === '통산' ? S.games : S.games.filter(g => (g.date||'').startsWith(S.year));
+const autoLG = g => g.pas.filter(p => p.side==='LG' && p.scored).length + g.events.filter(e => e.type==='R').length;
+const autoOpp = g => g.pas.filter(p => p.side==='OPP').reduce((s,p)=>s+(p.runs||0),0) + g.events.reduce((s,e)=>s+(e.runs||0),0);
+const lgScore = g => g.lgScore ?? autoLG(g);
+const oppScore = g => g.oppScore ?? autoOpp(g);
+const gRes = g => { if (!g.done) return ''; const a=lgScore(g), b=oppScore(g); return a>b?'W':a<b?'L':'D'; };
+const RESN = {W:'승',L:'패',D:'무'};
+const resBadge = g => g.done ? `<span class="rb ${gRes(g)}">${RESN[gRes(g)]}</span>` : '<span class="rb ing">진행 중</span>';
+const innList = g => { const mx = Math.max(9, ...g.pas.map(p=>p.inning), ...g.events.map(e=>e.inning)); const n = (g.extra || mx>9) ? Math.max(11,mx) : 9; return Array.from({length:n},(_,i)=>i+1); };
+
+function batAgg(pas){
+  const s = {PA:0,AB:0,H:0,_2B:0,_3B:0,HR:0,TB:0,RBI:0,BB:0,HBP:0,SO:0,SH:0,SF:0,GDP:0};
+  for (const pa of pas){
+    const r = RES[pa.result]; if (!r) continue;
+    s.PA++; if (r.ab) s.AB++;
+    if (r.h){ s.H++; s.TB += r.tb; if (r.tb===2) s._2B++; if (r.tb===3) s._3B++; if (r.tb===4) s.HR++; }
+    if (r.bb) s.BB++; if (r.hbp) s.HBP++; if (r.so) s.SO++; if (r.sh) s.SH++; if (r.sf) s.SF++; if (r.gdp) s.GDP++;
+    s.RBI += pa.rbi || 0;
+  }
+  s.AVG = s.AB ? s.H/s.AB : null;
+  const ob = s.AB + s.BB + s.HBP + s.SF;
+  s.OBP = ob ? (s.H+s.BB+s.HBP)/ob : null;
+  s.SLG = s.AB ? s.TB/s.AB : null;
+  s.OPS = (s.OBP!=null && s.SLG!=null) ? s.OBP + s.SLG : null;
+  return s;
+}
+// 한 경기에서 한 투수의 아웃·실점·자책
+function pitLine(g, pid){
+  let outs=0, R=0, ER=0, appeared = g.lgStarter===pid;
+  for (const p of g.pas){ if (p.side!=='OPP') continue;
+    if (p.pitcherId===pid){ outs += p.outs||0; appeared = true; }
+    if ((p.chargedId||p.pitcherId)===pid){ R += p.runs||0; ER += p.er||0; } }
+  for (const e of g.events){ if (!EV[e.type]?.def) continue;
+    if (e.pitcherId===pid) outs += e.outs||0;
+    if ((e.chargedId||e.pitcherId)===pid){ R += e.runs||0; ER += e.er||0; } }
+  return {outs,R,ER,appeared};
+}
+function teamSum(games){
+  const t = {G:0,W:0,L:0,D:0,RS:0,RA:0,streak:'-'};
+  const done = byDate(games).filter(g => g.done);
+  for (const g of done){ t.G++; t[gRes(g)]++; t.RS += lgScore(g); t.RA += oppScore(g); }
+  const wl = done.map(gRes).filter(r => r!=='D');
+  if (wl.length){ const last = wl[wl.length-1]; let n=0; for (let i=wl.length-1;i>=0 && wl[i]===last;i--) n++; t.streak = n + (last==='W'?'연승':'연패'); }
+  return t;
+}
+function recBy(games, keyFn, order){
+  const m = {};
+  for (const g of games){ if (!g.done) continue; const k = keyFn(g);
+    const r = m[k] || (m[k] = {k,G:0,W:0,L:0,D:0,RS:0,RA:0});
+    r.G++; r[gRes(g)]++; r.RS += lgScore(g); r.RA += oppScore(g); }
+  let rows = Object.values(m);
+  if (order) rows.sort((a,b)=>order.indexOf(a.k)-order.indexOf(b.k)); else rows.sort((a,b)=>String(a.k).localeCompare(String(b.k)));
+  return rows.map(r => [esc(r.k), r.G, r.W, r.L, r.D, pct(r.W,r.L), r.RS, r.RA]);
+}
+const passGame = (g,f) => !(f.opp && g.opp!==f.opp) && !(f.ha && (f.ha==='홈')!==!!g.home);
+
+function batterRows(games, f){
+  const rows = {}; const get = id => rows[id] || (rows[id] = {id,G:new Set(),pas:[],R:0,SB:0,CS:0});
+  for (const g of games){
+    if (!passGame(g,f)) continue;
+    for (const s of g.lineup) for (const pp of s.players) if (pp.pid) get(pp.pid).G.add(g.id);
+    for (const pa of g.pas){
+      if (pa.side!=='LG' || !pa.batterId) continue;
+      if (f.ph && pa.pHand!==f.ph) continue;
+      if (f.pf && pa.pForm!==f.pf) continue;
+      const r = get(pa.batterId); r.pas.push(pa); if (pa.scored) r.R++;
+    }
+    if (!f.ph && !f.pf) for (const e of g.events){ if (!e.pid) continue;
+      if (e.type==='R') get(e.pid).R++; if (e.type==='SB') get(e.pid).SB++; if (e.type==='CS') get(e.pid).CS++; }
+  }
+  return Object.values(rows).filter(r => r.pas.length).map(r => ({...r, G:r.G.size, s:batAgg(r.pas)})).sort((a,b)=>b.s.PA-a.s.PA);
+}
+function pitcherRows(games, f){
+  const rows = {}; const get = id => rows[id] || (rows[id] = {id,G:new Set(),GS:0,W:0,L:0,SV:0,HLD:0,BS:0,pas:[],outs:0,R:0,ER:0,QS:0});
+  for (const g of games){
+    if (!passGame(g,f)) continue;
+    if (g.lgStarter){ const r = get(g.lgStarter); r.G.add(g.id); r.GS++; const l = pitLine(g,g.lgStarter); if (l.outs>=18 && l.ER<=3) r.QS++; }
+    for (const pa of g.pas){
+      if (pa.side!=='OPP' || !pa.pitcherId) continue;
+      if (f.bs && pa.bSide!==f.bs) continue;
+      const r = get(pa.pitcherId); r.G.add(g.id); r.pas.push(pa); r.outs += pa.outs||0;
+      const c = get(pa.chargedId||pa.pitcherId); c.R += pa.runs||0; c.ER += pa.er||0;
+    }
+    if (!f.bs) for (const e of g.events){ if (!EV[e.type]?.def) continue;
+      if (e.pitcherId) get(e.pitcherId).outs += e.outs||0;
+      const cid = e.chargedId||e.pitcherId; if (e.runs && cid){ const c = get(cid); c.R += e.runs||0; c.ER += e.er||0; } }
+    for (const [pid,dv] of Object.entries(g.decisions||{})) if (dv && pid) get(pid)[dv]++;
+    for (const [pid,b] of Object.entries(g.blown||{})) if (b && pid) get(pid).BS++;
+  }
+  return Object.values(rows).map(r => ({...r, G:r.G.size, s:batAgg(r.pas)})).sort((a,b)=>b.outs-a.outs);
+}
+
+// 조건별 승률에 쓰는 한 경기 선수 기록
+function metrics(g, pid){
+  const pas = g.pas.filter(p => p.side==='LG' && p.batterId===pid);
+  const ev = k => g.events.filter(e => e.pid===pid && e.type===k).length;
+  return { s:batAgg(pas), played:g.lineup.some(sl=>sl.players.some(pp=>pp.pid===pid)),
+    runs: pas.filter(p=>p.scored).length + ev('R'), sb:ev('SB'), fine:ev('FINE'), err:ev('EF')+ev('ET'),
+    started: g.lgStarter===pid, ...pitLine(g,pid) };
+}
+const CONDS = [
+  ['출장한 경기', m=>m.played],
+  ['안타 친 경기', m=>m.s.H>=1],
+  ['멀티히트 경기', m=>m.s.H>=2],
+  ['무안타 경기', m=>m.s.AB>=1 && m.s.H===0],
+  ['2루타 친 경기', m=>m.s._2B>=1],
+  ['3루타 친 경기', m=>m.s._3B>=1],
+  ['홈런 친 경기', m=>m.s.HR>=1],
+  ['타점 올린 경기', m=>m.s.RBI>=1],
+  ['득점한 경기', m=>m.runs>=1],
+  ['볼넷 얻은 경기', m=>m.s.BB>=1],
+  ['도루한 경기', m=>m.sb>=1],
+  ['등판한 경기', m=>m.appeared],
+  ['선발 등판한 경기', m=>m.started],
+  ['6이닝 이상 던진 경기', m=>m.outs>=18],
+  ['선발 · 3실점 미만', m=>m.started && m.R<3],
+  ['선발 · 3자책 미만', m=>m.started && m.ER<3],
+  ['퀄리티스타트 (6이닝 3자책 이하)', m=>m.started && m.outs>=18 && m.ER<=3],
+  ['파인플레이 한 경기', m=>m.fine>=1],
+  ['실책한 경기', m=>m.err>=1],
+];
+
+// =====================================================================
+// ⑥ 화면 그리기 — 메인
+// =====================================================================
+const TABS = [['games','경기'],['team','팀'],['bat','타자'],['pit','투수'],['def','수비'],['cond','조건별 승률'],['vs','맞대결'],['roster','선수 명단']];
+function render(){
+  if (S.edit && curG()){ $('#app').innerHTML = editorHTML(); return; }
+  S.edit = null;
+  $('#app').innerHTML = `
+  <header class="top"><span style="min-width:60px">${USE_FB?'':'<span class="badge">연습 모드</span>'}</span>
+    <div class="title">⚾ LG 경기 기록장</div>
+    <span style="min-width:60px;text-align:right">${USE_FB&&S.user?`<button class="mini" onclick="App.logout()">로그아웃</button>`:''}</span></header>
+  <div class="years">${YEARS.map(y=>chip(y,S.year===y,`App.setYear('${y}')`)).join('')}</div>
+  <nav class="tabs">${TABS.map(([k,n])=>`<button class="${S.tab===k?'on':''}" onclick="App.setTab('${k}')">${n}</button>`).join('')}</nav>
+  <main>${VIEWS[S.tab]()}</main>`;
+}
+
+const VIEWS = {
+  games(){
+    const list = byDate(gamesIn()).reverse(), t = teamSum(gamesIn());
+    return `<div class="row between"><div class="sum">${S.year} · ${t.W}승 ${t.L}패 ${t.D}무 · 승률 ${pct(t.W,t.L)}</div>
+      <button class="btn" onclick="App.newGame()">+ 새 경기</button></div>
+    ${list.length ? list.map(g=>`<div class="gcard" onclick="App.openGame('${g.id}')">
+        <div><div class="gd">${fmtDate(g.date)} · ${g.home?'홈':'원정'} · ${esc(g.park)}</div><div class="gv">vs <b>${esc(g.opp)}</b></div></div>
+        <div class="gs">${lgScore(g)} : ${oppScore(g)} ${resBadge(g)}</div></div>`).join('')
+      : '<p class="empty">아직 기록한 경기가 없습니다.<br>[+ 새 경기]를 눌러 시작하세요.<br><br>💡 먼저 [선수 명단]에 선수를 넣어 두면 편합니다.</p>'}`;
+  },
+  team(){
+    const gs = gamesIn(), t = teamSum(gs);
+    const H = ['구분','경기','승','패','무','승률','득점','실점'];
+    const stat = (n,v) => `<div class="stat"><small>${n}</small><b>${v}</b></div>`;
+    return `<div class="stats">${stat('경기',t.G)}${stat('성적',`${t.W}-${t.L}-${t.D}`)}${stat('승률',pct(t.W,t.L))}${stat('연속',t.streak)}${stat('득점',t.RS)}${stat('실점',t.RA)}${stat('득실차',(t.RS-t.RA>0?'+':'')+(t.RS-t.RA))}</div>
+    <h3 class="sec">상대팀별</h3>${tbl(H, recBy(gs, g=>g.opp, TEAMS))}
+    <h3 class="sec">홈 / 원정</h3>${tbl(H, recBy(gs, g=>g.home?'홈':'원정', ['홈','원정']))}
+    <h3 class="sec">구장별</h3>${tbl(H, recBy(gs, g=>g.park, PARKS))}
+    <h3 class="sec">월별</h3>${tbl(H, recBy(gs, g=>(S.year==='통산'?g.date.slice(0,4)+'년 ':'')+Number(g.date.slice(5,7))+'월'))}`;
+  },
+  bat(){
+    const f = S.fb;
+    const rows = batterRows(gamesIn(), f).map(r => { const s=r.s; return [`<b>${esc(pn(r.id))}</b>`, r.G, s.PA, s.AB, s.H, s._2B, s._3B, s.HR, s.RBI, r.R, s.BB, s.HBP, s.SO, s.SH, s.SF, s.GDP, r.SB, r.CS, f3(s.AVG), f3(s.OBP), f3(s.SLG), f3(s.OPS)]; });
+    return `<div class="filters">
+      ${fsel('상대팀',f.opp,[['','전체'],...TEAMS.map(t=>[t,t])],"App.setF('fb','opp',this.value)")}
+      ${fsel('상대 투수',f.ph,[['','전체'],['L','좌투'],['R','우투']],"App.setF('fb','ph',this.value)")}
+      ${fsel('투구폼',f.pf,[['','전체'],...FORMS.map(x=>[x,x])],"App.setF('fb','pf',this.value)")}
+      ${fsel('홈/원정',f.ha,[['','전체'],['홈','홈'],['원정','원정']],"App.setF('fb','ha',this.value)")}</div>
+    ${tbl(['선수','경기','타석','타수','안타','2루타','3루타','홈런','타점','득점','볼넷','사구','삼진','희번','희플','병살','도루','도실','타율','출루율','장타율','OPS'], rows)}
+    <p class="hint">상대 투수 손·투구폼으로 거르면 득점·도루는 계산에서 빠집니다.</p>`;
+  },
+  pit(){
+    const f = S.fp;
+    const rows = pitcherRows(gamesIn(), f).map(r => { const s=r.s;
+      return [`<b>${esc(pn(r.id))}</b>`, r.G, r.GS, r.W, r.L, r.SV, r.HLD, r.BS, ipStr(r.outs), s.PA, s.H, s.HR, s.BB, s.HBP, s.SO, r.R, r.ER,
+        f2(r.outs ? r.ER*27/r.outs : null), f2(r.outs ? (s.H+s.BB)*3/r.outs : null), f3(s.AVG), r.QS]; });
+    return `<div class="filters">
+      ${fsel('상대팀',f.opp,[['','전체'],...TEAMS.map(t=>[t,t])],"App.setF('fp','opp',this.value)")}
+      ${fsel('상대 타자',f.bs,[['','전체'],['L','좌타'],['R','우타']],"App.setF('fp','bs',this.value)")}
+      ${fsel('홈/원정',f.ha,[['','전체'],['홈','홈'],['원정','원정']],"App.setF('fp','ha',this.value)")}</div>
+    ${tbl(['선수','경기','선발','승','패','세','홀','블론','이닝','타자','피안타','피홈런','볼넷','사구','삼진','실점','자책','평균자책','WHIP','피안타율','QS'], rows)}`;
+  },
+  def(){
+    const K = ['EF','ET','FINE','AST','DP','TPP','CSO','SBA','PB','PK','WP','BK'];
+    const m = {};
+    for (const g of gamesIn()) for (const e of g.events){ if (!EV[e.type]?.def || !e.pid) continue;
+      const r = m[e.pid] || (m[e.pid] = Object.fromEntries(K.map(k=>[k,0]))); r[e.type]++; }
+    const rows = Object.entries(m).map(([id,r]) => [`<b>${esc(pn(id))}</b>`, r.EF, r.ET, `<b>${r.EF+r.ET}</b>`, r.FINE, r.AST, r.DP, r.TPP, r.CSO, r.SBA,
+      (r.CSO+r.SBA) ? Math.round(r.CSO/(r.CSO+r.SBA)*100)+'%' : '-', r.PB, r.PK, r.WP, r.BK]);
+    return tbl(['선수','포구실책','송구실책','실책 계','파인플레이','보살','병살 참여','삼중살 참여','도루 저지','도루 허용','저지율','포일','견제사','폭투','보크'], rows)
+      + '<p class="hint">경기 기록의 [주루·수비] 탭에서 넣은 기록이 모입니다.</p>';
+  },
+  cond(){
+    const lg = playersOf('LG');
+    let body = '<p class="empty">선수를 고르면 그 선수의 조건별 팀 승률이 나옵니다.</p>';
+    if (S.cond){
+      const acc = CONDS.map(c => ({n:c[0],G:0,W:0,L:0,D:0}));
+      for (const g of gamesIn()){ if (!g.done) continue; const res = gRes(g), m = metrics(g,S.cond);
+        CONDS.forEach((c,i) => { if (c[1](m)){ acc[i].G++; acc[i][res]++; } }); }
+      const t = teamSum(gamesIn());
+      const rows = acc.filter(a=>a.G).map(a => [a.n, a.G, a.W, a.L, a.D, `<b>${pct(a.W,a.L)}</b>`]);
+      body = tbl(['조건','경기','승','패','무','승률'], [['<i>LG 전체 (비교용)</i>', t.G, t.W, t.L, t.D, pct(t.W,t.L)], ...rows])
+        + '<p class="hint">승률 = 승 ÷ (승 + 패), 무승부는 빼고 계산합니다. 경기 종료로 표시한 경기만 셉니다.</p>';
+    }
+    return `<div class="card"><div class="frow"><label>선수</label><select onchange="App.set('cond',this.value)"><option value="">-- 선택 --</option>${
+      lg.map(p=>`<option value="${p.id}" ${S.cond===p.id?'selected':''}>${esc(p.name)} (${handTag(p)})</option>`).join('')}</select></div></div>${body}`;
+  },
+  vs(){
+    const bat = S.vsMode==='bat';
+    const lg = playersOf('LG', bat?'B':'P');
+    let body = '<p class="empty">LG 선수를 고르세요.</p>';
+    if (S.vsP){
+      const pas = [];
+      for (const g of gamesIn()){ if (S.vsTeam && g.opp!==S.vsTeam) continue;
+        for (const pa of g.pas){
+          if (bat && pa.side==='LG' && pa.batterId===S.vsP) pas.push(pa);
+          if (!bat && pa.side==='OPP' && pa.pitcherId===S.vsP) pas.push(pa); } }
+      const line = (name,s) => [name, s.PA, s.AB, s.H, s._2B, s._3B, s.HR, s.BB+s.HBP, s.SO, `<b>${f3(s.AVG)}</b>`, f3(s.OPS)];
+      const H = ['구분','타석','타수','안타','2루타','3루타','홈런','4사구','삼진', bat?'타율':'피안타율','OPS'];
+      const typ = bat
+        ? [['좌투 상대',p=>p.pHand==='L'],['우투 상대',p=>p.pHand==='R'],...FORMS.map(fm=>[fm+' 상대',p=>p.pForm===fm])]
+        : [['좌타 상대',p=>p.bSide==='L'],['우타 상대',p=>p.bSide==='R']];
+      const typeRows = typ.map(([n,fn]) => { const s = batAgg(pas.filter(fn)); return s.PA ? line(n,s) : null; }).filter(Boolean);
+      const grp = {}; for (const pa of pas){ const k = bat ? pa.pitcherId : pa.batterId; (grp[k] = grp[k]||[]).push(pa); }
+      const oppRows = Object.entries(grp).map(([id,l]) => ({id, s:batAgg(l)})).sort((a,b)=>b.s.PA-a.s.PA)
+        .map(({id,s}) => line(`<b>${esc(pn(id))}</b> <small style="color:#888">${esc(S.pm[id]?.team||'')} ${handTag(S.pm[id])}</small>`, s));
+      body = `<h3 class="sec">전체</h3>${tbl(H,[line('전체',batAgg(pas))])}
+        <h3 class="sec">${bat?'투수 유형별':'타자 유형별'}</h3>${tbl(H,typeRows)}
+        <h3 class="sec">상대 ${bat?'투수':'타자'}별</h3>${tbl(H,oppRows)}`;
+    }
+    return `<div class="card">
+      <div class="chips">${chip('LG 타자 vs 상대 투수',bat,"App.setVs('bat')")}${chip('LG 투수 vs 상대 타자',!bat,"App.setVs('pit')")}</div>
+      <div class="frow"><label>LG 선수</label><select onchange="App.set('vsP',this.value)"><option value="">-- 선택 --</option>${
+        lg.map(p=>`<option value="${p.id}" ${S.vsP===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+      <div class="frow"><label>상대팀</label><select onchange="App.set('vsTeam',this.value)"><option value="">전체</option>${
+        TEAMS.map(t=>`<option ${S.vsTeam===t?'selected':''}>${t}</option>`).join('')}</select></div></div>${body}`;
+  },
+  roster(){
+    const list = playersOf(S.rteam);
+    const item = p => `<div class="pitem" onclick="App.editPlayer('${p.id}')"><b>${esc(p.name)}</b>${p.num?' #'+esc(p.num):''}<small>${handTag(p)}</small></div>`;
+    const ps = list.filter(isP), bs = list.filter(p=>!isP(p));
+    return `<div class="chips" style="margin-bottom:8px">${['LG',...TEAMS].map(t=>chip(t,S.rteam===t,`App.set('rteam','${t}')`)).join('')}</div>
+    <div class="row between"><b>${S.rteam} 선수 ${list.length}명</b><button class="btn" onclick="App.newPlayer()">+ 선수 추가</button></div>
+    <h3 class="sec">투수 (${ps.length})</h3>${ps.map(item).join('') || '<p class="hint">없음</p>'}
+    <h3 class="sec">타자 (${bs.length})</h3>${bs.map(item).join('') || '<p class="hint">없음</p>'}
+    <p class="hint">손 방향·투구폼은 한 번만 정하면 모든 경기에 자동으로 붙습니다. 이적한 선수는 [수정]에서 팀만 바꾸세요.</p>`;
+  }
+};
+
+// =====================================================================
+// ⑦ 화면 그리기 — 경기 기록 (편집 화면)
+// =====================================================================
+function editorHTML(){
+  const g = curG();
+  const T = {bat:['LG 공격',edBat],pit:['LG 투수(수비)',edPit],ev:['주루·수비',edEv],res:['점수·승패',edRes]};
+  return `<header class="top"><button class="mini" onclick="App.closeGame()">← 목록</button>
+    <div class="title">${fmtDate(g.date)} vs ${esc(g.opp)}</div><button class="mini" onclick="App.delGame()">삭제</button></header>
+  <nav class="tabs sub">${Object.entries(T).map(([k,[n]])=>`<button class="${S.gTab===k?'on':''}" onclick="App.set('gTab','${k}')">${n}</button>`).join('')}</nav>
+  <main>
+  <div class="card">
+    <div class="frow"><label>날짜</label><input type="date" value="${g.date}" onchange="App.gset('date',this.value)"></div>
+    <div class="frow"><label>상대팀</label><div class="chips">${TEAMS.map(t=>chip(t,g.opp===t,`App.gset('opp','${t}')`)).join('')}</div></div>
+    <div class="frow"><label>홈/원정</label><div class="chips">${chip('홈',g.home,"App.gset('home',true)")}${chip('원정',!g.home,"App.gset('home',false)")}</div>
+      <select onchange="App.gset('park',this.value)">${PARKS.map(p=>`<option ${g.park===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    <div class="score">LG ${lgScore(g)} : ${oppScore(g)} ${esc(g.opp)} ${resBadge(g)}</div>
+  </div>
+  ${T[S.gTab][1](g)}
+  </main>`;
+}
+
+// --- LG 공격 (기록지) ---
+function edBat(g){
+  const inns = innList(g), oppPs = playersOf(g.opp,'P');
+  const cell = (o,pid,i) => {
+    const pas = g.pas.filter(p => p.side==='LG' && p.order===o && p.batterId===pid && p.inning===i);
+    return `<td class="cell" onclick="App.cell(${o},'${pid}',${i})">${pas.map(pa=>{ const r=RES[pa.result];
+      return `<span class="r ${GCLS[r.g]}">${r.sh}${pa.rbi?` ${pa.rbi}타점`:''}${pa.scored?' ●':''}</span>`; }).join('')}</td>`;
+  };
+  const rows = g.lineup.map(slot => {
+    const o = slot.order;
+    if (!slot.players.length) return `<tr><td class="sticky"><b>${o}</b> <button class="link" onclick="App.slotPlayer(${o},0)">선수 선택</button></td>${inns.map(()=>'<td></td>').join('')}</tr>`;
+    return slot.players.map((pp,idx) => `<tr class="${idx?'subrow':''}"><td class="sticky"><b>${idx?'↳':o}</b>
+      <button class="link" onclick="App.slotPlayer(${o},${idx})">${esc(pn(pp.pid))}</button><span class="pos">${esc(pp.pos||'')}</span>
+      ${idx===slot.players.length-1?`<br><button class="mini" style="margin-top:3px" onclick="App.addSub(${o})">+ 교체</button>`:''}</td>
+      ${inns.map(i=>cell(o,pp.pid,i)).join('')}</tr>`).join('');
+  }).join('');
+  return `<div class="card">
+    <div class="frow"><label>상대 선발</label>${pSelect(g.oppStarter, oppPs, `App.gsetP('oppStarter',this.value,'${g.opp}','P')`)}</div>
+    <div class="frow"><label>지금 상대 투수</label>${pSelect(g.curOppP, oppPs, `App.gsetP('curOppP',this.value,'${g.opp}','P')`)}</div>
+    <p class="hint">상대 투수가 바뀌면 [지금 상대 투수]만 바꾸세요. 다음 타석부터 자동으로 들어갑니다.</p>
+    <div class="row"><button class="mini" onclick="App.copyLineup()">지난 경기 라인업 불러오기</button>
+      <button class="mini" onclick="App.gset('extra',${!g.extra})">${g.extra?'연장 칸 숨기기':'연장 10~11회 칸 보기'}</button></div>
+  </div>
+  <div class="gridwrap"><table class="grid"><thead><tr><th class="sticky">타순 · 선수</th>${inns.map(i=>`<th>${i}회</th>`).join('')}</tr></thead>
+  <tbody>${rows}</tbody></table></div>
+  <p class="hint">칸을 누르면 결과를 넣습니다. ● = 득점. 한 회에 두 번 나오면 같은 칸을 다시 눌러 [+ 타석 추가].</p>`;
+}
+
+// --- LG 투수 (상대 공격) ---
+function edPit(g){
+  const lgPs = playersOf('LG','P');
+  const lineupTxt = (g.oppLineup||[]).map((id,i)=> id ? `${i+1}.${esc(pn(id))}` : '').filter(Boolean).join(' ');
+  const blocks = innList(g).map(i => {
+    const pas = g.pas.filter(p => p.side==='OPP' && p.inning===i);
+    const evs = g.events.filter(e => EV[e.type]?.def && e.inning===i);
+    const outs = pas.reduce((s,p)=>s+(p.outs||0),0) + evs.reduce((s,e)=>s+(e.outs||0),0);
+    const runs = pas.reduce((s,p)=>s+(p.runs||0),0) + evs.reduce((s,e)=>s+(e.runs||0),0);
+    let prevP = null;
+    const before = g.pas.filter(p => p.side==='OPP' && p.inning < i); if (before.length) prevP = before[before.length-1].pitcherId;
+    const lines = pas.map(pa => { const r = RES[pa.result];
+      const chg = (pa.pitcherId && pa.pitcherId!==prevP) ? `<div class="chg">🔄 투수: ${esc(pn(pa.pitcherId))}</div>` : ''; prevP = pa.pitcherId;
+      return `${chg}<div class="li" onclick="App.editPA('${pa.id}')"><b>${esc(pn(pa.batterId))}</b><span class="r inl ${GCLS[r.g]}">${r.n}</span>
+        ${pa.runs?`<span class="runs">${pa.runs}실점${pa.er!==pa.runs?` (${pa.er}자책)`:''}</span>`:''}<span class="sp"></span><small>아웃 ${pa.outs||0}</small></div>`; }).join('');
+    const elines = evs.map(e => `<div class="li" onclick="App.editEv('${e.id}')">· ${EV[e.type].n} <b>${esc(pn(e.pid))}</b>${e.runs?` <span class="runs">${e.runs}실점</span>`:''}${e.outs?` <small>아웃 ${e.outs}</small>`:''}</div>`).join('');
+    return `<div class="inn"><div class="innh"><b>${i}회${g.home?'초':'말'}</b><span>아웃 ${outs} · 실점 ${runs}</span></div>${lines}${elines}
+      <div class="btns" style="margin-top:6px"><button class="mini" onclick="App.newOppPA(${i})">+ 상대 타자</button><button class="mini" onclick="App.newEv(${i},true)">+ 폭투·견제·실책 등</button></div></div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="frow"><label>LG 선발</label>${pSelect(g.lgStarter, lgPs, "App.gsetP('lgStarter',this.value,'LG','P')")}</div>
+    <div class="frow"><label>지금 LG 투수</label>${pSelect(g.curLgP, lgPs, "App.gsetP('curLgP',this.value,'LG','P')")}</div>
+    <div class="frow"><label>상대 라인업</label><button class="mini" onclick="App.openOppLineup()">설정하기</button><small>${lineupTxt||'아직 없음'}</small></div>
+    <p class="hint">투수가 바뀌면 [지금 LG 투수]만 바꾸세요. 상대 타자는 라인업 순서대로 자동으로 나옵니다.</p>
+    <div class="row"><button class="mini" onclick="App.gset('extra',${!g.extra})">${g.extra?'연장 칸 숨기기':'연장 10~11회 칸 보기'}</button></div>
+  </div>${blocks}`;
+}
+
+// --- 주루·수비 ---
+function edEv(g){
+  const list = [...g.events].sort((a,b)=>a.inning-b.inning);
+  return `<div class="row between"><b>주루·수비 기록 ${list.length}개</b><button class="btn" onclick="App.newEv(1,false)">+ 기록 추가</button></div>
+  ${list.length ? `<div class="card">${list.map(e => `<div class="li" onclick="App.editEv('${e.id}')"><small>${e.inning}회</small>
+     <span class="r inl ${EV[e.type]?.def?'out':'ob'}">${EV[e.type]?.n||e.type}</span><b>${esc(pn(e.pid))}</b>
+     ${e.runs?`<span class="runs">${e.runs}실점</span>`:''}${e.memo?`<small>${esc(e.memo)}</small>`:''}</div>`).join('')}</div>`
+   : '<p class="empty">득점, 도루, 실책, 파인플레이, 병살 참여, 도루 저지 등을 넣는 곳입니다.</p>'}
+  <p class="hint">💡 타석에서 홈인한 선수는 [LG 공격]에서 ● 득점으로 이미 기록됩니다. 대주자로 들어와 득점한 경우 등만 여기서 [득점]을 넣으세요.</p>`;
+}
+
+// --- 점수·승패 ---
+function edRes(g){
+  const inns = innList(g);
+  const lgR = i => g.pas.filter(p=>p.side==='LG'&&p.scored&&p.inning===i).length + g.events.filter(e=>e.type==='R'&&e.inning===i).length;
+  const opR = i => g.pas.filter(p=>p.side==='OPP'&&p.inning===i).reduce((s,p)=>s+(p.runs||0),0) + g.events.filter(e=>e.inning===i).reduce((s,e)=>s+(e.runs||0),0);
+  const lgRow = ['<b>LG</b>', ...inns.map(lgR), `<b>${lgScore(g)}</b>`];
+  const opRow = [`<b>${esc(g.opp)}</b>`, ...inns.map(opR), `<b>${oppScore(g)}</b>`];
+  const ps = [...new Set([g.lgStarter, ...g.pas.filter(p=>p.side==='OPP').map(p=>p.pitcherId), ...Object.keys(g.decisions||{})].filter(Boolean))];
+  return `<div class="card"><h4>점수</h4>
+    <div class="sc"><span>LG</span><button class="mini" onclick="App.score('lg',-1)">−</button><b>${lgScore(g)}</b><button class="mini" onclick="App.score('lg',1)">+</button><small>자동 ${autoLG(g)}</small></div>
+    <div class="sc"><span>${esc(g.opp)}</span><button class="mini" onclick="App.score('opp',-1)">−</button><b>${oppScore(g)}</b><button class="mini" onclick="App.score('opp',1)">+</button><small>자동 ${autoOpp(g)}</small></div>
+    ${(g.lgScore!=null||g.oppScore!=null)?`<button class="mini" onclick="App.autoScore()">자동 계산으로 되돌리기</button>`:'<p class="hint">점수는 기록에서 자동으로 계산됩니다. 다르면 −/+로 고치세요.</p>'}
+    <div class="frow"><label>경기 상태</label>${chip('진행 중',!g.done,"App.gset('done',false)")}${chip('경기 종료',g.done,"App.gset('done',true)")}</div>
+    <p class="hint">[경기 종료]를 눌러야 승패와 통계에 들어갑니다.</p></div>
+  <div class="card"><h4>이닝별 점수</h4>${tbl(['팀',...inns.map(String),'R'], g.home?[opRow,lgRow]:[lgRow,opRow])}</div>
+  <div class="card"><h4>LG 투수 결과</h4>${ps.length ? ps.map(pid => { const l = pitLine(g,pid); return `<div class="prow">
+      <b>${esc(pn(pid))}</b> ${pid===g.lgStarter?'<small>(선발)</small>':''} <small>${ipStr(l.outs)}이닝 ${l.R}실점 ${l.ER}자책</small>
+      <div class="chips">${DEC.map(([v,n])=>chip(n,(g.decisions[pid]||'')===v,`App.dec('${pid}','${v}')`)).join('')}${chip('블론세이브',!!g.blown[pid],`App.blown('${pid}')`)}</div>
+      <label class="fl">투구 수 <input type="number" inputmode="numeric" style="width:80px" value="${g.pitches[pid]??''}" onchange="App.pc('${pid}',this.value)"></label></div>`; }).join('')
+    : '<p class="hint">[LG 투수] 탭에서 기록하면 여기에 나옵니다.</p>'}</div>
+  <div class="card"><h4>메모</h4><textarea rows="3" style="width:100%" onchange="App.gset('memo',this.value)">${esc(g.memo)}</textarea></div>`;
+}
+
+// =====================================================================
+// ⑧ 팝업 창 (아래에서 올라오는 입력 창)
+// =====================================================================
+const M = [];
+function openM(fn){ M.push(fn); drawM(); }
+function drawM(){
+  const el = $('#modal');
+  if (!M.length){ el.classList.add('hidden'); el.innerHTML = ''; return; }
+  el.classList.remove('hidden'); el.innerHTML = `<div class="sheet">${M[M.length-1]()}</div>`;
+}
+function closeM(){ if (M[M.length-1]===playerM) S.newFor = null; M.pop(); drawM(); render(); }
+const resultChips = sel => ['안타','출루','아웃','희생','기타'].map(gn =>
+  `<div class="rg"><div class="rgl">${gn}</div><div class="chips">${RESULTS.filter(r=>r[2]===gn).map(([k,n])=>chip(n,sel===k,`App.d('result','${k}')`,'res '+GCLS[gn])).join('')}</div></div>`).join('');
+const btnRow = (save, delAct) => `<div class="btns"><button class="btn" onclick="${save}">저장</button><button class="btn ghost" onclick="App.closeM()">취소</button>${delAct?`<button class="btn ghost danger" onclick="${delAct}">삭제</button>`:''}</div>`;
+
+// 타순 선수 고르기
+function slotM(){
+  const d = S.d;
+  return `<h3>${d.order}번 타자${d.idx?' · 교체 선수':''}</h3>
+  <div class="frow"><label>선수</label>${pSelect(d.pid, playersOf('LG','B'), "App.dP('pid',this.value,'LG','B')")}</div>
+  <div class="frow"><label>포지션</label><div class="chips">${POS.map(p=>chip(p,d.pos===p,`App.d('pos','${p}')`)).join('')}</div></div>
+  ${btnRow('App.saveSlot()', d.exists?'App.delSlot()':'')}`;
+}
+// 한 칸(같은 회)의 타석 목록
+function cellM(){
+  const g = curG(), {order,pid,inning} = S.c;
+  const pas = g.pas.filter(p => p.side==='LG' && p.order===order && p.batterId===pid && p.inning===inning);
+  return `<h3>${order}번 ${esc(pn(pid))} · ${inning}회</h3>
+  ${pas.map((pa,k)=>{ const r=RES[pa.result]; return `<div class="li"><small>${k+1}번째</small><span class="r inl ${GCLS[r.g]}">${r.n}</span>
+    <small>vs ${esc(pn(pa.pitcherId))}${pa.rbi?` · ${pa.rbi}타점`:''}${pa.scored?' · 득점':''}</small><span class="sp"></span>
+    <button class="mini" onclick="App.editPA('${pa.id}')">수정</button></div>`; }).join('')}
+  <div class="btns"><button class="btn" onclick="App.newLGPA()">+ 타석 추가</button><button class="btn ghost" onclick="App.closeM()">닫기</button></div>`;
+}
+// 타석 결과 입력 (LG 타자 / 상대 타자 공용)
+function paM(){
+  const d = S.d, g = curG();
+  if (d.side==='LG') return `<h3>${d.order}번 ${esc(pn(d.batterId))} · ${d.inning}회</h3>
+    <div class="frow"><label>상대 투수</label>${pSelect(d.pitcherId, playersOf(g.opp,'P'), `App.dP('pitcherId',this.value,'${g.opp}','P')`)}</div>
+    ${resultChips(d.result)}
+    <div class="frow"><label>타점</label>${nums('rbi',d.rbi,4)}</div>
+    <div class="frow"><label>득점</label>${chip('이 타자가 홈인함 ●',d.scored,`App.d('scored',${!d.scored})`)}</div>
+    ${btnRow('App.savePA()', d.id?`App.delPA('${d.id}')`:'')}`;
+  return `<h3>${d.inning}회 · 상대 타자</h3>
+    <div class="frow"><label>타자</label>${pSelect(d.batterId, playersOf(g.opp,'B'), `App.dP('batterId',this.value,'${g.opp}','B')`)}</div>
+    <div class="frow"><label>LG 투수</label>${pSelect(d.pitcherId, playersOf('LG','P'), "App.dP('pitcherId',this.value,'LG','P')")}</div>
+    ${resultChips(d.result)}
+    <div class="frow"><label>아웃 수</label>${nums('outs',d.outs,3)}</div>
+    <div class="frow"><label>실점</label>${nums('runs',d.runs,4)}</div>
+    <div class="frow"><label>자책</label>${nums('er',d.er,4)}</div>
+    ${d.runs?`<div class="frow"><label>실점 책임</label><select onchange="App.d('chargedId',this.value)"><option value="">지금 투수 (${esc(pn(d.pitcherId))})</option>${
+      playersOf('LG','P').filter(p=>p.id!==d.pitcherId).map(p=>`<option value="${p.id}" ${d.chargedId===p.id?'selected':''}>${esc(p.name)} (앞 투수가 남긴 주자)</option>`).join('')}</select></div>`:''}
+    <p class="hint">아웃 수는 결과를 고르면 자동으로 정해집니다. 다르면 고치세요.</p>
+    ${btnRow('App.savePA()', d.id?`App.delPA('${d.id}')`:'')}`;
+}
+// 주루·수비 기록 입력
+function evM(){
+  const d = S.d, g = curG(), t = EV[d.type];
+  return `<h3>${d.id?'기록 수정':'주루·수비 기록'}</h3>
+  ${['주루','수비','포수','투수'].map(gr=>`<div class="rg"><div class="rgl">${gr}</div><div class="chips">${
+     EVENTS.filter(e=>e.g===gr).map(e=>chip(e.n,d.type===e.k,`App.d('type','${e.k}')`)).join('')}</div></div>`).join('')}
+  <div class="frow"><label>LG 선수</label>${pSelect(d.pid, playersOf('LG'), "App.dP('pid',this.value,'LG','B')")}</div>
+  <div class="frow"><label>회</label><select onchange="App.d('inning',+this.value)">${innList(g).map(i=>`<option value="${i}" ${d.inning===i?'selected':''}>${i}회</option>`).join('')}</select></div>
+  ${t&&t.def?`<div class="frow"><label>당시 LG 투수</label>${pSelect(d.pitcherId, playersOf('LG','P'), "App.dP('pitcherId',this.value,'LG','P')")}</div>
+    <div class="frow"><label>아웃 수</label>${nums('outs',d.outs,3)}</div>
+    <div class="frow"><label>실점</label>${nums('runs',d.runs,4)}</div>
+    <div class="frow"><label>자책</label>${nums('er',d.er,4)}</div>
+    <p class="hint">타석 결과로 이미 잡힌 아웃(병살타 등)은 0으로 두세요. 도루 저지·견제사처럼 타석 밖 아웃만 넣습니다.</p>`:''}
+  <div class="frow"><label>메모</label><input value="${esc(d.memo)}" oninput="App.dset('memo',this.value)" placeholder="예: 다이빙 캐치"></div>
+  ${btnRow('App.saveEv()', d.id?`App.delEv('${d.id}')`:'')}`;
+}
+// 상대 라인업
+function oppLineupM(){
+  const g = curG();
+  return `<h3>${esc(g.opp)} 선발 라인업</h3><p class="hint">순서대로 고르면 투수 기록 때 타자가 자동으로 나옵니다.</p>
+  ${Array.from({length:9},(_,i)=>`<div class="frow"><label>${i+1}번</label>${pSelect(g.oppLineup[i]||'', playersOf(g.opp,'B'), `App.olSet(${i},this.value)`)}</div>`).join('')}
+  <div class="btns"><button class="btn" onclick="App.closeM()">완료</button><button class="btn ghost" onclick="App.copyOppLineup()">지난 ${esc(g.opp)}전 라인업 불러오기</button></div>`;
+}
+// 선수 등록/수정
+function playerM(){
+  const d = S.pd;
+  return `<h3>${d.id?'선수 수정':'새 선수'}</h3>
+  <div class="frow"><label>이름</label><input value="${esc(d.name)}" oninput="App.pdset('name',this.value)" placeholder="예: 오지환"></div>
+  <div class="frow"><label>등번호</label><input value="${esc(d.num)}" inputmode="numeric" style="width:80px" oninput="App.pdset('num',this.value)"></div>
+  <div class="frow"><label>팀</label><div class="chips">${['LG',...TEAMS].map(t=>chip(t,d.team===t,`App.pd('team','${t}')`)).join('')}</div></div>
+  <div class="frow"><label>구분</label><div class="chips">${[['P','투수'],['B','타자'],['PB','투타 모두']].map(([v,n])=>chip(n,d.type===v,`App.pd('type','${v}')`)).join('')}</div></div>
+  ${isP(d)?`<div class="frow"><label>던지는 손</label><div class="chips">${chip('우투',d.throws==='R',"App.pd('throws','R')")}${chip('좌투',d.throws==='L',"App.pd('throws','L')")}</div></div>
+    <div class="frow"><label>투구폼</label><div class="chips">${FORMS.map(f=>chip(f,d.form===f,`App.pd('form','${f}')`)).join('')}</div></div>`:''}
+  ${isB(d)?`<div class="frow"><label>치는 손</label><div class="chips">${chip('우타',d.bats==='R',"App.pd('bats','R')")}${chip('좌타',d.bats==='L',"App.pd('bats','L')")}${chip('양타',d.bats==='S',"App.pd('bats','S')")}</div></div>`:''}
+  <p class="hint">한 번 정하면 모든 경기에 자동으로 붙습니다. 바꾸면 그다음 기록부터 새 값이 들어가고 예전 기록은 그대로 남습니다.</p>
+  ${btnRow('App.savePlayer()', d.id?'App.delPlayer()':'')}`;
+}
+function openPlayerForm(id, preset={}){
+  S.pd = id ? {...S.pm[id]} : {id:'',name:'',num:'',team:preset.team||'LG',type:preset.type||'B',throws:'R',form:'오버핸드',bats:'R'};
+  openM(playerM);
+}
+function snapshot(d){ // 그 순간의 손 방향·투구폼을 타석 기록에 붙여 둠
+  const p = S.pm[d.pitcherId], b = S.pm[d.batterId];
+  d.pHand = p?.throws||''; d.pForm = p?.form||'';
+  const bats = b?.bats||'';
+  d.bSide = bats==='S' ? (d.pHand==='L'?'R':'L') : bats;
+}
+function nextOpp(g){
+  const L = g.oppLineup||[], opp = g.pas.filter(p=>p.side==='OPP');
+  if (!opp.length) return L[0]||'';
+  const k = L.indexOf(opp[opp.length-1].batterId);
+  return k>=0 ? (L[(k+1)%9]||'') : (L[opp.length%9]||'');
+}
+
+// =====================================================================
+// ⑨ 버튼을 눌렀을 때 하는 일
+// =====================================================================
+window.App = {
+  closeM,
+  async login(){
+    try { await fb.A.signInWithPopup(fb.auth, new fb.A.GoogleAuthProvider()); }
+    catch(e){ if (e.code!=='auth/popup-closed-by-user') { try { await fb.A.signInWithRedirect(fb.auth, new fb.A.GoogleAuthProvider()); } catch(e2){ toast('로그인 실패: '+e2.code); } } }
+  },
+  logout(){ if (confirm('로그아웃할까요?')) fb.A.signOut(fb.auth); },
+  setYear(y){ S.year = y; render(); },
+  setTab(t){ S.tab = t; render(); },
+  set(k,v){ S[k] = v; render(); },
+  setF(o,k,v){ S[o][k] = v; render(); },
+  setVs(m){ S.vsMode = m; S.vsP = ''; render(); },
+
+  // --- 경기 ---
+  newGame(){
+    const t = todayISO();
+    const date = (S.year==='통산' || t.startsWith(S.year)) ? t : `${S.year}-03-28`;
+    const g = {id:uid(), created:String(Date.now()), date, opp:'SSG', home:true, park:'잠실', done:false, extra:false,
+      oppStarter:'', lgStarter:'', curOppP:'', curLgP:'',
+      lineup:Array.from({length:9},(_,i)=>({order:i+1,players:[]})), oppLineup:Array(9).fill(''),
+      pas:[], events:[], decisions:{}, blown:{}, pitches:{}, lgScore:null, oppScore:null, memo:''};
+    S.games.push(g); saveGame(g); S.edit = g.id; S.gTab = 'bat'; render(); window.scrollTo(0,0);
+  },
+  openGame(id){ S.edit = id; S.gTab = 'bat'; render(); window.scrollTo(0,0); },
+  closeGame(){ S.edit = null; render(); },
+  delGame(){
+    if (!confirm('이 경기 기록을 모두 지울까요? 되돌릴 수 없습니다.')) return;
+    const id = S.edit; S.games = S.games.filter(g=>g.id!==id); removeGame(id); S.edit = null; render();
+  },
+  gset(k,v){
+    const g = curG(); g[k] = v;
+    if (k==='opp' || k==='home') g.park = g.home ? '잠실' : TEAM_PARK[g.opp];
+    saveGame(g); render();
+  },
+  gsetP(k,v,team,type){
+    const g = curG();
+    const apply = id => {
+      g[k] = id;
+      if (k==='oppStarter' && !g.pas.some(p=>p.side==='LG')) g.curOppP = id;
+      if (k==='lgStarter' && !g.pas.some(p=>p.side==='OPP')) g.curLgP = id;
+      saveGame(g);
+    };
+    if (v==='__new'){ S.newFor = {apply}; render(); openPlayerForm(null,{team,type}); return; }
+    apply(v); render();
+  },
+  copyLineup(){
+    const g = curG();
+    if (g.pas.some(p=>p.side==='LG')) return toast('이미 타석 기록이 있어서 바꿀 수 없습니다');
+    const prev = byDate(S.games).filter(x => x.id!==g.id && x.date<=g.date && x.lineup.some(s=>s.players.length)).pop();
+    if (!prev) return toast('불러올 지난 경기가 없습니다');
+    g.lineup = prev.lineup.map(s => ({order:s.order, players: s.players.length ? [{...s.players[0]}] : []}));
+    saveGame(g); render(); toast(`${fmtDate(prev.date)} 경기 라인업을 불러왔습니다`);
+  },
+  score(side,delta){
+    const g = curG();
+    if (side==='lg') g.lgScore = Math.max(0, lgScore(g)+delta); else g.oppScore = Math.max(0, oppScore(g)+delta);
+    saveGame(g); render();
+  },
+  autoScore(){ const g = curG(); g.lgScore = null; g.oppScore = null; saveGame(g); render(); },
+  dec(pid,v){ const g = curG(); g.decisions[pid] = v; saveGame(g); render(); },
+  blown(pid){ const g = curG(); g.blown[pid] = !g.blown[pid]; saveGame(g); render(); },
+  pc(pid,v){ const g = curG(); g.pitches[pid] = v===''?null:Number(v); saveGame(g); },
+
+  // --- 팝업 입력값 ---
+  d(k,v){
+    const d = S.d; d[k] = v;
+    if (k==='result'){
+      const r = RES[v];
+      if (d.side==='OPP'){ d.outs = r.outs||0; if (r.tb===4){ d.runs = Math.max(d.runs,1); d.er = Math.max(d.er,1); } }
+      if (d.side==='LG' && r.tb===4){ d.scored = true; d.rbi = Math.max(d.rbi,1); }
+    }
+    if (k==='runs' && d.er>v) d.er = v;
+    if (k==='er' && v>d.runs) d.runs = v;
+    if (k==='type'){ d.outs = EV[v].outs||0; if (['WP','BK','PK'].includes(v) && !d.pid) d.pid = d.pitcherId; }
+    drawM();
+  },
+  dset(k,v){ S.d[k] = v; },
+  dP(k,v,team,type){
+    if (v==='__new'){ S.newFor = {apply:id=>{ S.d[k] = id; }}; openPlayerForm(null,{team,type}); return; }
+    App.d(k,v);
+  },
+
+  // --- 타순 ---
+  slotPlayer(o,idx){
+    const pp = curG().lineup.find(s=>s.order===o).players[idx];
+    S.d = {kind:'slot', order:o, idx, pid:pp?.pid||'', pos:pp?.pos||'', exists:!!pp}; openM(slotM);
+  },
+  addSub(o){
+    const n = curG().lineup.find(s=>s.order===o).players.length;
+    S.d = {kind:'slot', order:o, idx:n, pid:'', pos:'대타', exists:false}; openM(slotM);
+  },
+  saveSlot(){
+    const d = S.d, g = curG(); if (!d.pid) return toast('선수를 골라 주세요');
+    const slot = g.lineup.find(s=>s.order===d.order), old = slot.players[d.idx];
+    if (old && old.pid!==d.pid) g.pas.forEach(p => { if (p.side==='LG' && p.order===d.order && p.batterId===old.pid){ p.batterId = d.pid; snapshot(p); } });
+    slot.players[d.idx] = {pid:d.pid, pos:d.pos};
+    saveGame(g); closeM();
+  },
+  delSlot(){
+    const d = S.d, g = curG(), slot = g.lineup.find(s=>s.order===d.order), pp = slot.players[d.idx];
+    if (g.pas.some(p=>p.side==='LG' && p.order===d.order && p.batterId===pp.pid)) return toast('타석 기록이 있는 선수는 뺄 수 없습니다. 기록을 먼저 지우세요');
+    slot.players.splice(d.idx,1); saveGame(g); closeM();
+  },
+
+  // --- 타석 ---
+  cell(o,pid,i){
+    S.c = {order:o, pid, inning:i};
+    const has = curG().pas.some(p => p.side==='LG' && p.order===o && p.batterId===pid && p.inning===i);
+    if (has) openM(cellM); else App.newLGPA();
+  },
+  newLGPA(){
+    const g = curG();
+    S.d = {kind:'pa', side:'LG', order:S.c.order, batterId:S.c.pid, inning:S.c.inning, pitcherId:g.curOppP||g.oppStarter||'', result:'', rbi:0, scored:false};
+    openM(paM);
+  },
+  newOppPA(i){
+    const g = curG();
+    S.d = {kind:'pa', side:'OPP', inning:i, batterId:nextOpp(g), pitcherId:g.curLgP||g.lgStarter||'', result:'', outs:0, runs:0, er:0, chargedId:''};
+    openM(paM);
+  },
+  editPA(id){ S.d = {...curG().pas.find(p=>p.id===id)}; openM(paM); },
+  savePA(){
+    const d = S.d, g = curG();
+    if (!d.result) return toast('결과를 골라 주세요');
+    if (!d.batterId) return toast('타자를 골라 주세요');
+    snapshot(d);
+    const rec = {...d}; delete rec.kind;
+    if (rec.id){ const i = g.pas.findIndex(p=>p.id===rec.id); g.pas[i] = rec; } else { rec.id = uid(); g.pas.push(rec); }
+    if (rec.side==='LG' && rec.pitcherId) g.curOppP = rec.pitcherId;
+    if (rec.side==='OPP' && rec.pitcherId) g.curLgP = rec.pitcherId;
+    saveGame(g); closeM();
+  },
+  delPA(id){
+    if (!confirm('이 타석 기록을 지울까요?')) return;
+    const g = curG(); g.pas = g.pas.filter(p=>p.id!==id); saveGame(g);
+    M.pop();
+    if (M[M.length-1]===cellM && !g.pas.some(p=>p.side==='LG'&&p.order===S.c.order&&p.batterId===S.c.pid&&p.inning===S.c.inning)) M.pop();
+    drawM(); render();
+  },
+
+  // --- 주루·수비 ---
+  newEv(i, defOnly){
+    const g = curG();
+    // 그 회에 던지던 LG 투수를 자동으로 고름
+    const upto = g.pas.filter(p => p.side==='OPP' && p.inning<=i && p.pitcherId);
+    const pAt = upto.length ? upto[upto.length-1].pitcherId : (g.lgStarter||g.curLgP||'');
+    S.d = {kind:'ev', type: defOnly?'WP':'', pid:'', inning:i, pitcherId:pAt, outs:0, runs:0, er:0, memo:''};
+    if (defOnly) S.d.pid = S.d.pitcherId;
+    openM(evM);
+  },
+  editEv(id){ S.d = {kind:'ev', ...curG().events.find(e=>e.id===id)}; openM(evM); },
+  saveEv(){
+    const d = S.d, g = curG();
+    if (!d.type) return toast('종류를 골라 주세요');
+    if (!d.pid) return toast('선수를 골라 주세요');
+    const rec = {...d}; delete rec.kind;
+    if (!EV[rec.type].def){ rec.outs = 0; rec.runs = 0; rec.er = 0; rec.pitcherId = ''; }
+    if (rec.id){ const i = g.events.findIndex(e=>e.id===rec.id); g.events[i] = rec; } else { rec.id = uid(); g.events.push(rec); }
+    saveGame(g); closeM();
+  },
+  delEv(id){
+    if (!confirm('이 기록을 지울까요?')) return;
+    const g = curG(); g.events = g.events.filter(e=>e.id!==id); saveGame(g); closeM();
+  },
+
+  // --- 상대 라인업 ---
+  openOppLineup(){ openM(oppLineupM); },
+  olSet(i,v){
+    const g = curG();
+    if (v==='__new'){ S.newFor = {apply:id=>{ g.oppLineup[i] = id; saveGame(g); }}; openPlayerForm(null,{team:g.opp,type:'B'}); return; }
+    g.oppLineup[i] = v; saveGame(g); drawM();
+  },
+  copyOppLineup(){
+    const g = curG();
+    const prev = byDate(S.games).filter(x => x.id!==g.id && x.opp===g.opp && x.date<=g.date && (x.oppLineup||[]).some(Boolean)).pop();
+    if (!prev) return toast(`지난 ${g.opp}전 라인업이 없습니다`);
+    g.oppLineup = [...prev.oppLineup]; saveGame(g); drawM(); toast('불러왔습니다');
+  },
+
+  // --- 선수 명단 ---
+  newPlayer(){ openPlayerForm(null,{team:S.rteam, type:'B'}); },
+  editPlayer(id){ openPlayerForm(id); },
+  pd(k,v){ S.pd[k] = v; drawM(); },
+  pdset(k,v){ S.pd[k] = v; },
+  savePlayer(){
+    const d = S.pd; d.name = (d.name||'').trim();
+    if (!d.name) return toast('이름을 넣어 주세요');
+    if (S.players.some(p => p.id!==d.id && p.team===d.team && p.name===d.name && (p.num||'')===(d.num||'')))
+      return toast('같은 팀에 같은 이름이 있습니다. 등번호로 구분해 주세요');
+    if (!d.id){ d.id = uid(); S.players.push({...d}); } else { const i = S.players.findIndex(p=>p.id===d.id); S.players[i] = {...d}; }
+    refreshPM(); savePlayerDB(d);
+    const nf = S.newFor; S.newFor = null;
+    M.pop(); if (nf) nf.apply(d.id);
+    drawM(); render(); toast('저장했습니다');
+  },
+  delPlayer(){
+    const id = S.pd.id;
+    if (S.games.some(g => JSON.stringify(g).includes(id))) return toast('경기 기록에 있는 선수는 지울 수 없습니다. 이적은 팀만 바꾸세요');
+    if (!confirm('이 선수를 지울까요?')) return;
+    S.players = S.players.filter(p=>p.id!==id); refreshPM(); removePlayer(id); closeM();
+  },
+};
+
+// =====================================================================
+// ⑩ 시작!
+// =====================================================================
+if (USE_FB) initFirebase().catch(e => { $('#app').innerHTML = `<p class="empty">파이어베이스 연결 오류<br>${esc(e.message)}</p>`; });
+else { loadLocal(); refreshPM(); render(); }
+</script>
+</body>
+</html>
