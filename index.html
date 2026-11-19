@@ -97,6 +97,80 @@ span.r.inl{display:inline-block}
 .badge{white-space:nowrap;background:#fff;color:var(--lg);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:700}
 #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:50;display:none}
 @media(min-width:700px){.modal{align-items:center}.sheet{border-radius:16px}}
+
+/* ================= 선명하고 예쁘게 (가독성 높이기) ================= */
+:root{--lg:#C30452;--lg2:#8f0a3f;--ink:#1d1d22;--soft:#fdf0f5;--line:#e4e4ea;--bg:#f2f2f5}
+body{font-size:17px;line-height:1.5;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+/* 맨 위 제목줄: 검정 → LG 빨강 */
+.top{background:linear-gradient(120deg,#16161a 0%,#3a0a1f 45%,var(--lg) 100%);padding:14px 16px;min-height:62px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.title{font-size:21px;font-weight:800;letter-spacing:.5px}
+.badge{font-size:13px}
+/* 연도 고르기 */
+.years{gap:8px;padding:12px 14px;background:#fff}
+.years .chip{font-size:16px;font-weight:700;padding:9px 20px;border:2px solid #e2e2e8;color:#555;background:#fafafb}
+.years .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+/* 위쪽 메뉴 */
+.tabs{background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.05);position:sticky;top:62px;z-index:4}
+.tabs button{flex:1 0 auto;padding:15px 18px;font-size:17px;color:#777;border-bottom-width:4px}
+.tabs button.on{color:var(--lg);font-weight:800}
+.tabs.sub{top:62px}
+main{padding:14px}
+/* 버튼 */
+.chip{font-size:16px;padding:9px 16px;border-radius:22px;margin:4px;border-width:1.5px}
+.btn{font-size:17px;padding:13px 20px;border-radius:12px;box-shadow:0 2px 6px rgba(195,4,82,.25)}
+.btn.ghost{box-shadow:none}
+.mini{font-size:15px;padding:8px 13px;border-radius:10px}
+.link{font-size:16px;font-weight:600}
+/* 카드 */
+.card,.inn,.pitem,.gcard,.stat,.tw,.gridwrap{border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.04)}
+.card{padding:16px}
+h3.sec{font-size:20px;margin:26px 2px 12px;padding-left:12px;border-left:5px solid var(--lg)}
+.hint{font-size:15px;color:#6b6b75}
+.sum{font-size:20px;font-weight:800}
+/* 경기 목록: 승은 빨강, 패는 검정, 무는 회색 줄 */
+.gcard{padding:16px 18px;margin-bottom:12px;border-left:7px solid #d5d5dc}
+.gcard.W{border-left-color:var(--lg)}.gcard.L{border-left-color:#2a2a30}.gcard.D{border-left-color:#a0a0a8}.gcard.ing{border-left-color:#f0b429}
+.gd{font-size:15px;color:#777}.gv{font-size:21px;margin-top:4px}.gv b{font-weight:800}
+.gs{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.rb{font-size:15px;padding:4px 12px;border-radius:12px;margin-left:8px;font-weight:800;letter-spacing:0}
+.rb.L{background:#2a2a30}
+.score{font-size:26px;font-weight:800;margin-top:12px}
+/* 숫자 카드 */
+.stats{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}
+.stat{padding:14px 10px}.stat small{font-size:14px}.stat b{font-size:27px;color:var(--lg);font-variant-numeric:tabular-nums}
+/* 기록 표 */
+table.t{font-size:16px;font-variant-numeric:tabular-nums}
+.t th,.t td{padding:12px 13px;border-bottom:1px solid #ececf1}
+.t th{background:var(--ink);color:#fff;font-weight:700;font-size:15px}
+.t th:first-child{background:var(--ink)}
+.t tbody tr:nth-child(even) td{background:#f8f8fb}
+.t tbody tr:nth-child(even) td:first-child{background:#f8f8fb}
+.t tbody tr:hover td{background:var(--soft)}
+.t td:first-child{font-weight:600;box-shadow:inset -1px 0 0 #ececf1}
+.filters{gap:12px;margin-bottom:14px}
+.fl{font-size:15px;font-weight:600}
+select,input,textarea{font-size:17px;padding:10px;border-radius:10px}
+.frow>label{font-size:16px;min-width:110px}
+/* 경기 기록지 칸 */
+table.grid{font-size:15px}
+.grid th{background:var(--ink);color:#fff;padding:9px 6px;border-color:#33333a}
+.grid th.sticky{background:var(--ink)}
+.grid td{padding:5px}
+.grid td.cell{min-width:72px;height:56px}
+.grid .mini{font-size:13px;padding:3px 8px;margin-top:4px !important}
+.grid .sticky{min-width:140px;max-width:170px;font-size:16px}
+.pos{font-size:13px}
+.r{font-size:14px;padding:3px 6px;border-radius:6px;margin:2px 0;font-weight:600}
+.r.hit{background:var(--lg);color:#fff}.r.ob{background:#1f6fd1;color:#fff}.r.out{background:#e8e8ee;color:#444}.r.sac{background:#f0b429;color:#3a2a00}.r.etc{background:#2e9d5b;color:#fff}
+.rgl{font-size:14px;font-weight:700;color:#666}
+/* 회별 기록 */
+.inn{padding:14px;margin-bottom:10px;border-left:5px solid var(--lg)}
+.innh b{font-size:18px}.innh span{font-size:15px}
+.li{padding:10px 6px;font-size:16px}
+.runs{font-size:15px}
+.pitem{padding:14px 16px;font-size:17px;margin-bottom:8px}
+.sc{font-size:18px}.sc b{font-size:26px}
+.login .logo{font-size:72px}.login h2{font-size:26px;color:var(--lg)}
 </style>
 </head>
 <body>
@@ -159,7 +233,7 @@ const RESULTS = [
   ['E','실책 출루','기타','실책',{ab:1}],
   ['FC','야수선택','기타','야선',{ab:1,outs:1}],
 ];
-const RES = {}; RESULTS.forEach(([k,n,g,sh,o]) => RES[k] = {k,n,g,sh,...o});
+const RES = {}; RESULTS.forEach(([k,n,g,sn,o]) => RES[k] = {k,n,g,sn,...o});   // sn=짧은이름 (sh=희생번트와 헷갈리지 않게)
 const GCLS = {안타:'hit',출루:'ob',아웃:'out',희생:'sac',기타:'etc'};
 
 // 주루·수비 기록 종류 (def=수비 중 기록 → 투수 아웃/실점과 연결)
@@ -439,9 +513,9 @@ function render(){
 const VIEWS = {
   games(){
     const list = byDate(gamesIn()).reverse(), t = teamSum(gamesIn());
-    return `<div class="row between"><div class="sum">${S.year} · ${t.W}승 ${t.L}패 ${t.D}무 · 승률 ${pct(t.W,t.L)}</div>
+    return `<div class="row between"><div class="sum">${S.year} · <span style="color:var(--lg)">${t.W}승</span> ${t.L}패 ${t.D}무 · 승률 ${pct(t.W,t.L)}</div>
       <button class="btn" onclick="App.newGame()">+ 새 경기</button></div>
-    ${list.length ? list.map(g=>`<div class="gcard" onclick="App.openGame('${g.id}')">
+    ${list.length ? list.map(g=>`<div class="gcard ${g.done?gRes(g):'ing'}" onclick="App.openGame('${g.id}')">
         <div><div class="gd">${fmtDate(g.date)} · ${g.home?'홈':'원정'} · ${esc(g.park)}</div><div class="gv">vs <b>${esc(g.opp)}</b></div></div>
         <div class="gs">${lgScore(g)} : ${oppScore(g)} ${resBadge(g)}</div></div>`).join('')
       : '<p class="empty">아직 기록한 경기가 없습니다.<br>[+ 새 경기]를 눌러 시작하세요.<br><br>💡 먼저 [선수 명단]에 선수를 넣어 두면 편합니다.</p>'}`;
@@ -572,7 +646,7 @@ function edBat(g){
   const cell = (o,pid,i) => {
     const pas = g.pas.filter(p => p.side==='LG' && p.order===o && p.batterId===pid && p.inning===i);
     return `<td class="cell" onclick="App.cell(${o},'${pid}',${i})">${pas.map(pa=>{ const r=RES[pa.result];
-      return `<span class="r ${GCLS[r.g]}">${r.sh}${pa.rbi?` ${pa.rbi}타점`:''}${pa.scored?' ●':''}</span>`; }).join('')}</td>`;
+      return `<span class="r ${GCLS[r.g]}">${r.sn}${pa.rbi?` ${pa.rbi}타점`:''}${pa.scored?' ●':''}</span>`; }).join('')}</td>`;
   };
   const rows = g.lineup.map(slot => {
     const o = slot.order;
